@@ -1,0 +1,9 @@
+// Cuando un post tiene mas de una imagen o es un video tiene una clase 
+// llamada _aatp
+
+// El post se divide entre dos divs
+// "__aagv"
+// "__aagw"
+
+// Cuando el post tiene una previsualizacion de contenido de visitas
+// El div cambia de nombre

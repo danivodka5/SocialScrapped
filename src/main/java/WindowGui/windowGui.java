@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.nio.CharBuffer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,16 +28,21 @@ public class windowGui {
 
     // Atributos
 	private JFrame mainFrame;
-	
 	private JPanel socialPanel;
 	private JLabel socialLabel;
-	
 	private JTextField userTF = new JTextField();
 	private JPasswordField passTF = new JPasswordField();
-	
+
+	// Atributo ChromeDriver
+	private ChromeDriver driver;
 	private JButton login = new JButton();
 	
-	public void loadGui(final ChromeDriver driver) {
+	public windowGui(ChromeDriver driver) {
+		this.driver = driver;
+		loadGui();
+	}
+	
+	private void loadGui() {
 		mainFrame = new JFrame ("Instagram Login");
 		
 		//No redimensionable
@@ -86,7 +89,6 @@ public class windowGui {
 		login.setBounds(110,200,150,25);
 		login.setEnabled(false);
 		
-	
 		// La contraseña necesita como minimo 6 caracteres.
 		passTF.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -120,17 +122,16 @@ public class windowGui {
 		login.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				metodoDriver(driver);			// Le indicamos al driver que pulse iniciar sesion
-				checkLogin(driver);
+				metodoDriver();			// Le indicamos al driver que pulse iniciar sesion
+				checkLogin();
 				userTF.setText("");				// Limpiamos el campo de usuario
 				passTF.setText("");				// Limpiamos el campo de pass
 			}			
 		});	
 	}	
 
-	public ChromeDriver metodoDriver(ChromeDriver driver) {
+	private void metodoDriver() {
 	
-		
 		// String name = (String) js.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\"); return collection[0].value;");
 		// Obtener valores en instagram -> System.out.println(campoa.getAttribute("value"));
 		WebElement campoa = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input"));
@@ -145,6 +146,9 @@ public class windowGui {
 		campoa.sendKeys(userTF.getText());
 		campob.sendKeys(new String(passTF.getPassword()));
 		campoa.sendKeys(Keys.ENTER);
+		
+		passTF.setText("");
+		
 		/*
 		sendbutton.click();
 		
@@ -190,9 +194,8 @@ public class windowGui {
 		// document.getElementsByName("username")[0].value = "lel"; 
 		
 		// Usted use xpath and javascript
-		return driver;
 	}
-	private boolean checkLogin(ChromeDriver driver) {
+	private boolean checkLogin() {
 		// Output1 : Inicio de sesion correcto
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		System.out.println(js.executeScript("return document.readyState"));
@@ -229,36 +232,47 @@ public class windowGui {
 		return false;
 	}
 	
-	/*
-	 * 
-	 * 		boolean condicion = true;
-		while(condicion) {
-			try { Thread.sleep(1000); } catch (InterruptedException e) { }
-			String url = driver.getCurrentUrl();
-			// Inicio de sesion
-			if (url.contains("?next=%2F")){
-				System.out.println("Iniciando sesion ...");
-				chooseUser cu = new chooseUser(driver);		
-				condicion = false;
-				
-				mainFrame.setVisible(false); //you can't see me!
-				mainFrame.dispose(); 	     //Destroy the JFrame object
-			}
-			// Recuperar Cuenta
-			if (url.contains("https://www.instagram.com/challenge")) {
-				driver.get("https://www.instagram.com/");
-				condicion = false;
-				System.out.println("Error instagram challenge");
-			} 
-			// Contraseña incorrecta : saborap asdasdasd
-			else {
-				try {
-					WebElement inc = driver.findElement(By.className("_ab2z"));
-					System.out.println("inc ="+inc.getText()); // Ponerle esto al usuario
-					condicion = false;
-				}catch(Exception e) { }
-			}
-		}
-	 * 
-	 */
+	public boolean loginBoolean() {
+		return login.isEnabled();
+	}
+	public void userTFsetText(String text) {
+		userTF.setText(text);
+	}
+	public void passTFsetText(String text) {
+		passTF.setText(text);
+	}
 }
+
+
+/*
+ * 
+ * 		boolean condicion = true;
+	while(condicion) {
+		try { Thread.sleep(1000); } catch (InterruptedException e) { }
+		String url = driver.getCurrentUrl();
+		// Inicio de sesion
+		if (url.contains("?next=%2F")){
+			System.out.println("Iniciando sesion ...");
+			chooseUser cu = new chooseUser(driver);		
+			condicion = false;
+			
+			mainFrame.setVisible(false); //you can't see me!
+			mainFrame.dispose(); 	     //Destroy the JFrame object
+		}
+		// Recuperar Cuenta
+		if (url.contains("https://www.instagram.com/challenge")) {
+			driver.get("https://www.instagram.com/");
+			condicion = false;
+			System.out.println("Error instagram challenge");
+		} 
+		// Contraseña incorrecta : saborap asdasdasd
+		else {
+			try {
+				WebElement inc = driver.findElement(By.className("_ab2z"));
+				System.out.println("inc ="+inc.getText()); // Ponerle esto al usuario
+				condicion = false;
+			}catch(Exception e) { }
+		}
+	}
+ * 
+ */

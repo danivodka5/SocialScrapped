@@ -36,15 +36,13 @@ public class chooseUser extends JFrame {
 	private String path = "";
 	private ArrayList<String> srcPhotos;
 	
-	
 	public chooseUser(ChromeDriver driver) {
 		this.driver = driver;
 		windowConfig();
 	}
 	
-	public void windowConfig () {
+	private void windowConfig () {
 		download.setEnabled(false);
-		
 		setTitle("Username");
 		setSize(500, 100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -147,4 +145,5 @@ public class chooseUser extends JFrame {
 		}	
 		System.out.println("Fin DescargarPerfil");
 	}
+	
 }
