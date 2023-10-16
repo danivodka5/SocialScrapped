@@ -2,33 +2,30 @@ package WindowGui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.nio.CharBuffer;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
-import javax.swing.JFileChooser;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.border.EmptyBorder;
 
-import org.openqa.selenium.Dimension;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-//        Alt Shift A
+// Alt Shift A
 public class windowGui {
-	
-    public static void main(String[] args) {
-        windowGui wg = new windowGui();
-        
-        wg.loadGui();
-    }
-	
+
     // Atributos
 	private JFrame mainFrame;
 	
@@ -36,15 +33,17 @@ public class windowGui {
 	private JLabel socialLabel;
 	
 	private JTextField userTF = new JTextField();
-	private JPasswordField passTF;
+	private JPasswordField passTF = new JPasswordField();
 	
-	private void loadGui() {
-		
+	private JButton login = new JButton();
+	private boolean status = false;
+
+	private StringBuffer a ;
+	
+	public void loadGui(final ChromeDriver driver) {
 		mainFrame = new JFrame ("Inicio de Sesion");
-		
 		//No redimensionable
 		mainFrame.setResizable(false);
-		
 		// Window Size
 		mainFrame.setSize(400, 300);
         mainFrame.setVisible(true);	
@@ -77,9 +76,72 @@ public class windowGui {
 		
 		
 		userTF.setBounds(110,100,150, 25);
+		userTF.setBorder(new EmptyBorder(0,0,0,0));
+
+
+		passTF.setBounds(110, 150, 150, 25);
+		passTF.setBorder(new EmptyBorder(0,0,0,0));
+		
+		
+		login.setText("Iniciar Sesión");
+		login.setBounds(110,200,150,25);
 		
 		mainFrame.add(socialLabel);
 		mainFrame.add(userTF);
-	
+		mainFrame.add(passTF);
+		mainFrame.add(login);
+		
+		// Metodo que se activa al presionar el boton de iniciarSesion
+		login.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Metodo que recibe un driver
+				metodoDriver(driver);
+			}			
+		});
+		
+
+	}	
+	public StringBuffer getA() {
+		a.append(userTF.getText());
+		return a;
+	}
+	public CharBuffer getB() {
+		return CharBuffer.wrap(passTF.getPassword());
+	}
+	public boolean getStatus() {
+		return status;
+	}
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+	public ChromeDriver metodoDriver(ChromeDriver driver) {
+		WebElement campoa = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input"));
+		WebElement campob = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[2]/div/label/input"));
+		WebElement sendbutton = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[3]/button"));
+		char [] k  = passTF.getPassword();
+		
+		campoa.sendKeys(userTF.getText());
+		campob.sendKeys(new String(passTF.getPassword()));
+		sendbutton.click();
+		Arrays.fill(k, '*');
+		
+		// Si la contraseña es muy corta no se envia nada
+		// Solo se puede presionar el boton cuando se vaya a iniciar sesion, despues no se puede mas(se cierra)
+		
+		// Esperamos 3 segundos a cargar la pagina
+		try { TimeUnit.SECONDS.sleep(2); } catch (InterruptedException e) {  e.printStackTrace(); }
+		
+		// Este es el caso en que se falle el inicio de sesion
+		try {
+			WebElement login = driver.findElement(By.className("_ab2z"));
+			driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input")).clear();
+			driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input")).sendKeys(Keys.BACK_SPACE);
+			driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[2]/div/label/input")).clear();
+			
+			System.out.println("primero encontrado");
+		} catch (Exception e) { System.out.println("No se ha encontrado el fallo de sesion"); }
+		
+		return driver;
 	}
 }
