@@ -1,3 +1,5 @@
 // Esperar a que algo aparezca
-
 https://stackoverflow.com/questions/11001030/how-i-can-check-whether-a-page-is-loaded-completely-or-not-in-web-driver
+
+// Encontrar todo el texto de la pagina web (muy util)
+WebElement numeros = driver.findElement(By.xpath("*"));

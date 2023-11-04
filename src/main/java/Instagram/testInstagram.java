@@ -28,6 +28,7 @@ public class testInstagram {
 		boolean cookies = true;
 		while (cookies){
 			try {
+				Thread.sleep(1000);
 				System.out.println("Cookies localizadas, rechazando..");
 				driver.findElement(By.xpath("/html/body/div[5]/div[1]/div/div[2]/div/div/div/div/div[2]/div/button[2]")).click();
 				cookies = false;
@@ -41,9 +42,7 @@ public class testInstagram {
 		
 		// Objeto ventana
 		windowGui wg = new windowGui();
-		ChromeDriver load = wg.loadGui(driver);
-		
-		System.out.println(load);
+		wg.loadGui(driver);
 		
 		// 1 minuto
 	
@@ -58,8 +57,6 @@ public class testInstagram {
 		// Si la credencial es correcta cierro la ventana.
 		
 		// Como detecto el inicio de sesion correcto exactamente?
-
-		
 	
 	/*
 	try {
