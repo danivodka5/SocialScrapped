@@ -5,11 +5,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.nio.CharBuffer;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,13 +22,8 @@ import javax.swing.event.DocumentListener;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.common.base.Predicate;
 
 // Alt Shift A
 public class windowGui {
@@ -46,12 +38,10 @@ public class windowGui {
 	private JPasswordField passTF = new JPasswordField();
 	
 	private JButton login = new JButton();
-	private boolean status = false;
-
-	private StringBuffer a ;
 	
 	public void loadGui(final ChromeDriver driver) {
 		mainFrame = new JFrame ("Inicio de Sesion");
+		
 		//No redimensionable
 		mainFrame.setResizable(false);
 		// Window Size
@@ -92,11 +82,13 @@ public class windowGui {
 		passTF.setBounds(110, 150, 150, 25);
 		passTF.setBorder(new EmptyBorder(0,0,0,0));
 		
-		
 		login.setText("Iniciar Sesión");
 		login.setBounds(110,200,150,25);
 		login.setEnabled(false);
 		
+		
+		
+		// La contraseña necesita como minimo 6 caracteres.
 		passTF.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -115,7 +107,6 @@ public class windowGui {
                 try {
                     login.setEnabled((passTF.getText().length() > 5) && (userTF.getText().length() > 0));
                 } catch (NumberFormatException e) {
-                    // Si no es un número válido, deshabilitamos el botón
                    	login.setEnabled(false);
                 }
             }
@@ -126,76 +117,44 @@ public class windowGui {
 		mainFrame.add(passTF);
 		mainFrame.add(login);
 		
+		
+		
 		// Metodo que se activa al presionar el boton de iniciarSesion
 		login.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				metodoDriver(driver);			// Le indicamos al driver que pulse iniciar sesion
+				checkLogin(driver);
 				userTF.setText("");				// Limpiamos el campo de usuario
 				passTF.setText("");				// Limpiamos el campo de pass
 			}			
-		});
-	
+		});	
 	}	
-	public StringBuffer getA() {
-		a.append(userTF.getText());
-		return a;
-	}
-	public CharBuffer getB() {
-		return CharBuffer.wrap(passTF.getPassword());
-	}
-	public boolean getStatus() {
-		return status;
-	}
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+
 	public ChromeDriver metodoDriver(ChromeDriver driver) {
-		// El boton se activa cuando la longitud de la contraseña es mayor a 5
-		JavascriptExecutor js = (JavascriptExecutor) driver;
-		System.out.println("-- 1 --");
-		// String name = (String) js.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\"); return collection[0].value;");
 	
 		
-		/*
-		System.out.println("Intentado almacenar js");
-		driver.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\")");
-		System.out.println("avanzamos de const");
-		driver.executeScript("console.log(collection[0])");
-		*/
-		System.out.println("exito");
-		
+		// String name = (String) js.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\"); return collection[0].value;");
 		// Obtener valores en instagram -> System.out.println(campoa.getAttribute("value"));
 		WebElement campoa = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input"));
 		WebElement campob = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[2]/div/label/input"));
 		WebElement sendbutton = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[3]/button"));
-		
-		// Enviar la informacion
-		campoa.sendKeys(userTF.getText());
-		campob.sendKeys(new String(passTF.getPassword()));
-		sendbutton.click();
-		
+			
 		// Limpiar campos inicio sesion
 		campoa.sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
 		campob.sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
 		
-		// La contraseña necesita como minimo 6 caracteres.
+		// Enviar la informacion
+		campoa.sendKeys(userTF.getText());
+		campob.sendKeys(new String(passTF.getPassword()));
+		campoa.sendKeys(Keys.ENTER);
+		/*
+		sendbutton.click();
+		
 		// Solo se puede presionar el boton cuando se vaya a iniciar sesion, despues no se puede mas(se cierra)
-		
-		boolean sesion = true;
-		
-		while (sesion) {
-			System.out.println(js.executeScript("return document.readyState"));
-			String state = (String) js.executeScript("return document.readyState");
-			if (state.equals("complete")) {
-				sesion = false;
-			}
-		}
-		
-		// Output1 : Inicio de sesion correcto
-		// Output2 : Ayudanos a confirmar que eres tu 
-		// Output3 : Contraseña incorrecta
-		// saborap asdasdasd
+	
+		*/
+	
 		
 		/*
 		// Esperamos 3 segundos a cargar la pagina
@@ -207,6 +166,15 @@ public class windowGui {
 		} catch (Exception e) { System.out.println("No se ha encontraod ningun error"); }
 		js.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\"); collection[0].value = '"+ userTF.getText() +"'; collection[1].value = '"+new String(passTF.getPassword())+"'");
 		*/
+		
+		/*
+		System.out.println("Intentado almacenar js");
+		driver.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\")");
+		System.out.println("avanzamos de const");
+		driver.executeScript("console.log(collection[0])");
+		*/
+		
+		
 		
 /*
  * const collection = document.getElementsByClassName("_aa4b _add6 _ac4d");
@@ -227,7 +195,73 @@ public class windowGui {
 		// Usted use xpath and javascript
 		return driver;
 	}
-	private void botonIniciarSesionReleased(java.awt.event.KeyEvent evt ) {
-
+	private boolean checkLogin(ChromeDriver driver) {
+		// Output1 : Inicio de sesion correcto
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		System.out.println(js.executeScript("return document.readyState"));
+		boolean condicion = true;
+		while(condicion) {
+			try { Thread.sleep(1000); } catch (InterruptedException e) { }
+			String url = driver.getCurrentUrl();
+			
+			// Inicio de sesion
+			if (url.contains("?next=%2F")){
+				System.out.println("Iniciando sesion ...");
+				chooseUser cu = new chooseUser(driver);		
+				condicion = false;
+				
+				mainFrame.setVisible(false); // you can't see me!
+				mainFrame.dispose(); 	     // Destroy the JFrame object
+				return true;
+			}
+			// Recuperar Cuenta
+			if (url.contains("https://www.instagram.com/challenge")) {
+				System.out.println("Error instagram challenge");
+				driver.get("https://www.instagram.com/");
+				condicion = false;
+			} 
+			// Contraseña incorrecta : saborap asdasdasd
+			else {
+				try {
+					WebElement inc = driver.findElement(By.className("_ab2z"));
+					System.out.println("inc ="+inc.getText()); // Ponerle esto al usuario
+					condicion = false;
+				}catch(Exception e) { }
+			}
+		}
+		return false;
 	}
+	
+	/*
+	 * 
+	 * 		boolean condicion = true;
+		while(condicion) {
+			try { Thread.sleep(1000); } catch (InterruptedException e) { }
+			String url = driver.getCurrentUrl();
+			// Inicio de sesion
+			if (url.contains("?next=%2F")){
+				System.out.println("Iniciando sesion ...");
+				chooseUser cu = new chooseUser(driver);		
+				condicion = false;
+				
+				mainFrame.setVisible(false); //you can't see me!
+				mainFrame.dispose(); 	     //Destroy the JFrame object
+			}
+			// Recuperar Cuenta
+			if (url.contains("https://www.instagram.com/challenge")) {
+				driver.get("https://www.instagram.com/");
+				condicion = false;
+				System.out.println("Error instagram challenge");
+			} 
+			// Contraseña incorrecta : saborap asdasdasd
+			else {
+				try {
+					WebElement inc = driver.findElement(By.className("_ab2z"));
+					System.out.println("inc ="+inc.getText()); // Ponerle esto al usuario
+					condicion = false;
+				}catch(Exception e) { }
+			}
+		}
+	 * 
+	 */
 }

@@ -34,8 +34,6 @@ public class Test1DownloadImage {
 			System.out.println(imageUrl);
 		}
 		
-
-		
 		for (int i=0; i< imageElement.size(); i++) {
 			try {
 				System.out.println("1");

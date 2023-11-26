@@ -17,10 +17,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import WindowGui.windowGui;
 
 public class testInstagram {	
-
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		
+	public static void main(String[] args) {		
 		ChromeDriver driver = new ChromeDriver();
 		String url = "https://www.instagram.com/accounts/login/";	
 		driver.get(url);
@@ -30,40 +27,14 @@ public class testInstagram {
 			try {
 				Thread.sleep(1000);
 				System.out.println("Cookies localizadas, rechazando..");
-				driver.findElement(By.xpath("/html/body/div[5]/div[1]/div/div[2]/div/div/div/div/div[2]/div/button[2]")).click();
+				driver.findElement(By.cssSelector("button[class='_a9-- _ap36 _a9_1']")).click();
 				cookies = false;
 			} catch (Exception e) {
-				System.out.println("Cookies no localizadas");
+				System.out.println("No se pudo rechazar las cookies");
 			}
 		}
-		
-		// Rechazar cookies
-		driver.findElement(By.xpath("/html/body/div[5]/div[1]/div/div[2]/div/div/div/div/div[2]/div/button[2]")).click();
-		
 		// Objeto ventana
 		windowGui wg = new windowGui();
 		wg.loadGui(driver);
-		
-		// 1 minuto
-	
-		// ChronoUnit.MINUTES.getDuration()
-		// System.out.println(duration.toMinutes());	
-		//WebDriverWait wait = new WebDriverWait(driver, duration); 
-		
-	
-		
-		// Cuando haya cargado la pagina abro una ventana pidicendo credenciales
-		
-		// Si la credencial es correcta cierro la ventana.
-		
-		// Como detecto el inicio de sesion correcto exactamente?
-	
-	/*
-	try {
-		TimeUnit.SECONDS.sleep(2);
-	} catch (InterruptedException e) {
-		e.printStackTrace();
 	}
-	*/
-}
 }
