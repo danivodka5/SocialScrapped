@@ -3,6 +3,12 @@ package WindowGui;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -66,7 +72,7 @@ public class chooseUser extends JFrame {
 				directoryWindow dw = new directoryWindow();
 				path = dw.getWindow();
 				
-				//if usuario existe
+				// Implementar if usuario existe
 				if ( (path.length() > 1) && (user.length() > 1)) {
 					System.out.println("permitimos boton");
 					download.setEnabled(true);
@@ -94,9 +100,27 @@ public class chooseUser extends JFrame {
 	}
 	private void buscarPerfil() {
 		System.out.println("Iniciando metodo descargarPerfil()");
+		ArrayList<String> srcPhotos = new ArrayList<>();
+		
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		boolean condicion = true;
 		while (condicion ) {
+						
+			List<WebElement> divphotos = driver.findElements(By.cssSelector("div[class='_aagv']"));	
+			System.out.println("Cantidad "+divphotos.size());
+			
+			for (WebElement div : divphotos) {
+				List<WebElement> images = div.findElements(By.tagName("img"));
+				for (WebElement image : images ) {
+					String srcset = image.getAttribute("src");
+					// Lo añado a una lista, si en la lista no esta.
+					System.out.println(srcset+"\n");
+					if (!srcPhotos.contains(srcset)) {
+						srcPhotos.add(srcset);
+					}
+				}
+			}
+			
 			js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
 			try {
 				Thread.sleep(700);
@@ -106,8 +130,11 @@ public class chooseUser extends JFrame {
 				condicion = false;
 			}
 		}
-		List<WebElement> photos = driver.findElements(By.cssSelector("div[class='_aatp']"));	
-		System.out.println("Lista tamaño = "+photos.size());
+		System.out.println("Hay un total de "+srcPhotos.size()+" fotos\n");
+		for (int i=0; i<srcPhotos.size(); i++) {
+			System.out.println(srcPhotos.get(i)+"\n");
+		}
+		
 		/*
 		for (int i=0; i<photos.size(); i++) {
 			try {
@@ -131,5 +158,28 @@ public class chooseUser extends JFrame {
 	}
 	private void descargarPerfil() {
 		
+	}
+	private void descargarImagen(String imageUrl) {
+	    try {
+	    	URL url = new URL(imageUrl);
+	    	BufferedInputStream in = new BufferedInputStream(url.openStream());
+        
+	    	// Obtiene el nombre de la imagen del URL
+	    	String fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+	    	BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
+
+	    	// Descarga el contenido de la imagen
+	    	int i;
+	    	while ((i = in.read()) != -1) {
+	    		out.write(i);
+	    	}
+	    	
+	    	// Cierra los flujos de entrada y salida
+	    	out.flush();
+	    	out.close();
+	    	in.close();
+	    } catch (IOException e) {
+	    	e.printStackTrace();
+	    }
 	}
 }

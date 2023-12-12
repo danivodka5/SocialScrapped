@@ -40,7 +40,7 @@ public class windowGui {
 	private JButton login = new JButton();
 	
 	public void loadGui(final ChromeDriver driver) {
-		mainFrame = new JFrame ("Inicio de Sesion");
+		mainFrame = new JFrame ("Instagram Login");
 		
 		//No redimensionable
 		mainFrame.setResizable(false);
@@ -86,8 +86,7 @@ public class windowGui {
 		login.setBounds(110,200,150,25);
 		login.setEnabled(false);
 		
-		
-		
+	
 		// La contraseña necesita como minimo 6 caracteres.
 		passTF.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -117,8 +116,6 @@ public class windowGui {
 		mainFrame.add(passTF);
 		mainFrame.add(login);
 		
-		
-		
 		// Metodo que se activa al presionar el boton de iniciarSesion
 		login.addActionListener(new ActionListener() {
 			@Override
@@ -136,9 +133,9 @@ public class windowGui {
 		
 		// String name = (String) js.executeScript("const collection = document.getElementsByClassName(\"_aa4b _add6 _ac4d\"); return collection[0].value;");
 		// Obtener valores en instagram -> System.out.println(campoa.getAttribute("value"));
-		WebElement campoa = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input"));
-		WebElement campob = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[2]/div/label/input"));
-		WebElement sendbutton = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[3]/button"));
+		WebElement campoa = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input"));
+		WebElement campob = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[2]/div/label/input"));
+		WebElement sendbutton = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[3]/button/div"));
 			
 		// Limpiar campos inicio sesion
 		campoa.sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));

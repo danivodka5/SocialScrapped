@@ -23,6 +23,9 @@ public class testInstagram {
 		driver.get(url);
 
 		boolean cookies = true;
+		
+		// Poner boton de seleccionar todas las imagenes
+		// Descargar
 		while (cookies){
 			try {
 				Thread.sleep(1000);
