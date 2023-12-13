@@ -96,7 +96,7 @@ public class Boton extends JButton{
 				}
 			}			
 	    }
-        g.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 18, 18);
+        //g.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 18, 18);
    }
    
    public boolean contains(int x, int y) {

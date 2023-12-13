@@ -11,8 +11,13 @@
     	<artifactId>selenium-java</artifactId>
     	<version>4.11.0</version>
 	</dependency>
-	
-	
+
+
+	<dependency>
+		<groupId>Bonolots</groupId>
+		<artifactId>Bonolots</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
   </dependencies>
     
 </project>

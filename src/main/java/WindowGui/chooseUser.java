@@ -33,6 +33,7 @@ public class chooseUser extends JFrame {
 	private String user = "";
 	private String path = "";
 	
+	
 	public chooseUser(ChromeDriver driver) {
 		this.driver = driver;
 		windowConfig();
@@ -114,7 +115,6 @@ public class chooseUser extends JFrame {
 				for (WebElement image : images ) {
 					String srcset = image.getAttribute("src");
 					// Lo añado a una lista, si en la lista no esta.
-					System.out.println(srcset+"\n");
 					if (!srcPhotos.contains(srcset)) {
 						srcPhotos.add(srcset);
 					}
@@ -130,30 +130,17 @@ public class chooseUser extends JFrame {
 				condicion = false;
 			}
 		}
+		
 		System.out.println("Hay un total de "+srcPhotos.size()+" fotos\n");
 		for (int i=0; i<srcPhotos.size(); i++) {
+			descargarImagen(srcPhotos.get(i));
 			System.out.println(srcPhotos.get(i)+"\n");
-		}
-		
-		/*
-		for (int i=0; i<photos.size(); i++) {
-			try {
-				List<WebElement> nose = photos.get(i).findElements(By.xpath("./../*"));
-				System.out.println("nose="+(i+1)+ " "+nose.size());
-				
-				System.out.println(nose.get(i).findElement(By.name("_aatp")));
-				
-			} catch (Exception e) {
-				System.out.println("No se encontro la clase en la foto "+i);
-			}			
-		}
-		*/
-		System.out.println("Fin de cargar imagenes\n");
+		}	
+		System.out.println("Fin de descargar imagenes\n");
 		
 		
 		// Si hay una secuencia(un post con varias imagenes) se entra, sino solo descargamos la imagen
 		// Todas las fotos derivan de la clase "_aagu", las que tienen secuencia son ademas "_aatp";
-		
 		// Esquema, me voy a la foto, le pregunto si tiene secuencia, si la tiene 
 	}
 	private void descargarPerfil() {
@@ -166,7 +153,7 @@ public class chooseUser extends JFrame {
         
 	    	// Obtiene el nombre de la imagen del URL
 	    	String fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-	    	BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
+	    	BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(path));
 
 	    	// Descarga el contenido de la imagen
 	    	int i;

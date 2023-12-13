@@ -219,7 +219,6 @@ public class InstagramLoginGui {
 			}			
 		});	
 	}
-	
 public ChromeDriver metodoDriver(ChromeDriver driver) {
 		WebElement campoa = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[1]/div/label/input"));
 		WebElement campob = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[2]/div/label/input"));
