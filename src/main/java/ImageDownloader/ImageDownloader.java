@@ -23,7 +23,7 @@ public class ImageDownloader {
         if (extension != null) {
             System.out.println("La extensión de imagen del URL es: " + extension);
             try {
-    			downloadImage(url,path,user,1,extension);
+    			downloadImage(url,path,user,number,extension);
     			System.out.println("Imagen descargada con exito");
     		} catch (IOException e) { e.printStackTrace(); }
         }    	
@@ -33,7 +33,9 @@ public class ImageDownloader {
     	try {
     		URL url = new URL(imageUrl);
     		InputStream is = url.openStream();
-    		FileOutputStream fos = new FileOutputStream(destinationPath+"\\"+user+number+"."+extension);
+    		String ruta = destinationPath+"\\"+user+number+"."+extension;
+    		FileOutputStream fos = new FileOutputStream(ruta);
+    		
     		byte[] bytes = new byte[1024];
     		int len;
     		while((len = is.read(bytes)) != -1) {
@@ -69,9 +71,10 @@ public class ImageDownloader {
         if (extension != null) {
             System.out.println("La extensión de imagen del URL es: " + extension);
             try {
-    			downloadImage(url,"D:\\Prueba","zac",1,extension);
+    			downloadImage(url,"D:\\Prueba","xhillo",1,extension);
     		} catch (IOException e) { e.printStackTrace(); }
         }    
         */
+        
     }
 }

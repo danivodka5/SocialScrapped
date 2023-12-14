@@ -22,6 +22,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import ImageDownloader.ImageDownloader;
+
 public class chooseUser extends JFrame {
 	
 	private JTextField userInput = new JTextField(15);
@@ -32,6 +34,7 @@ public class chooseUser extends JFrame {
 	
 	private String user = "";
 	private String path = "";
+	private ArrayList<String> srcPhotos;
 	
 	
 	public chooseUser(ChromeDriver driver) {
@@ -101,7 +104,7 @@ public class chooseUser extends JFrame {
 	}
 	private void buscarPerfil() {
 		System.out.println("Iniciando metodo descargarPerfil()");
-		ArrayList<String> srcPhotos = new ArrayList<>();
+		srcPhotos = new ArrayList<>();
 		
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		boolean condicion = true;
@@ -130,13 +133,7 @@ public class chooseUser extends JFrame {
 				condicion = false;
 			}
 		}
-		
-		System.out.println("Hay un total de "+srcPhotos.size()+" fotos\n");
-		for (int i=0; i<srcPhotos.size(); i++) {
-			descargarImagen(srcPhotos.get(i));
-			System.out.println(srcPhotos.get(i)+"\n");
-		}	
-		System.out.println("Fin de descargar imagenes\n");
+		System.out.println("Fin de buscarPerfil\n");
 		
 		
 		// Si hay una secuencia(un post con varias imagenes) se entra, sino solo descargamos la imagen
@@ -144,29 +141,10 @@ public class chooseUser extends JFrame {
 		// Esquema, me voy a la foto, le pregunto si tiene secuencia, si la tiene 
 	}
 	private void descargarPerfil() {
-		
-	}
-	private void descargarImagen(String imageUrl) {
-	    try {
-	    	URL url = new URL(imageUrl);
-	    	BufferedInputStream in = new BufferedInputStream(url.openStream());
-        
-	    	// Obtiene el nombre de la imagen del URL
-	    	String fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-	    	BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(path));
-
-	    	// Descarga el contenido de la imagen
-	    	int i;
-	    	while ((i = in.read()) != -1) {
-	    		out.write(i);
-	    	}
-	    	
-	    	// Cierra los flujos de entrada y salida
-	    	out.flush();
-	    	out.close();
-	    	in.close();
-	    } catch (IOException e) {
-	    	e.printStackTrace();
-	    }
+		System.out.println("Hay un total de "+srcPhotos.size()+" fotos\n");
+		for (int i=0; i<srcPhotos.size(); i++) {
+			ImageDownloader id = new ImageDownloader(srcPhotos.get(i),path,user,i);
+		}	
+		System.out.println("Fin DescargarPerfil");
 	}
 }
