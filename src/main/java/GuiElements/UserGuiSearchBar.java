@@ -1,6 +1,7 @@
 package GuiElements;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
@@ -19,7 +20,9 @@ public class UserGuiSearchBar extends JTextField {
 		
 		// Hace el campo de texto transparente para ver el fondo
 		setOpaque(false);
+		
 		setColumns(10);
+		setFont(new Font("Arial", Font.PLAIN, 19));
 
 		LineBorder b1 = new LineBorder(new Color(5,5,5),0);
 		

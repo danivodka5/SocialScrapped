@@ -5,9 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +40,10 @@ public class chooseUser extends JFrame {
 	private String path = "";
 	private ArrayList<String> srcPhotos;
 	
+	private String posts;
+	private String seguidores;
+	private String siguiendo;
+	
 	public chooseUser(ChromeDriver driver) {
 		this.driver = driver;
 		windowConfig();
@@ -55,6 +63,8 @@ public class chooseUser extends JFrame {
 				ejecutarBusqueda(user);
 				System.out.println("user length "+user.length());
 				
+				// Este metodo es para saber cuando esta cargada la pagina web
+				// Solucionado en UserGui
 				try {
 					Thread.sleep(2000);
 					buscarPerfil();
@@ -85,6 +95,7 @@ public class chooseUser extends JFrame {
 		download.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// Colocar un Threads si es necesario
 				descargarPerfil();
 			}
 		});
@@ -99,9 +110,39 @@ public class chooseUser extends JFrame {
 	}
 	private void ejecutarBusqueda (String username) {
 		driver.get("https://www.instagram.com/"+username);
+		
+		boolean c = true;
+		while (c) {
+			try {
+				Thread.sleep(1000);
+				
+				// Header
+				// console.log("bio ="+document.getElementsByClassName('_ap3a _aaco _aacu _aacx _aad6 _aade')[0].firstChild.nodeValue);
+				// document.getElementsByClassName('_ap3a _aaco _aacu _aacx _aad6 _aade')[0].firstChild.nodeValue;
+
+				// Header
+				WebElement header = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/div[2]/section/main/div/header/section/div[3]/div[1]/span"));
+				System.out.println("header ="+header.getText());
+				
+				// H1
+				WebElement h1 = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/div[2]/section/main/div/header/section/div[3]/h1"));
+				System.out.println("h1="+h1.getText());
+				
+				// Link
+				WebElement link = driver.findElement(By.xpath("/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/div[2]/section/main/div/header/section/div[3]/div[3]/a/span/span"));
+				System.out.println("link="+link.getText());
+				c = false;
+				
+			} catch(Exception e) {
+				System.out.println("--- ERROR -----");
+			}
+		}
+
+		// Testing, borrar osea mover		
+		
 	}
 	private void buscarPerfil() {
-		System.out.println("Iniciando metodo descargarPerfil()");
+		System.out.println("Iniciando metodo buscarPerfil()");
 		srcPhotos = new ArrayList<>();
 		
 		JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -137,13 +178,59 @@ public class chooseUser extends JFrame {
 		// Si hay una secuencia(un post con varias imagenes) se entra, sino solo descargamos la imagen
 		// Todas las fotos derivan de la clase "_aagu", las que tienen secuencia son ademas "_aatp";
 		// Esquema, me voy a la foto, le pregunto si tiene secuencia, si la tiene 
+		
+		// Buscamos la informacion del perfil temporalmente
+		analizarPerfil(user);
 	}
 	private void descargarPerfil() {
-		System.out.println("Hay un total de "+srcPhotos.size()+" fotos\n");
+		System.out.println("Hay un total de "+srcPhotos.size()+" fotos\nDescargando fotos...");
 		for (int i=0; i<srcPhotos.size(); i++) {
 			ImageDownloader id = new ImageDownloader(srcPhotos.get(i),path,user,i);
 		}	
-		System.out.println("Fin DescargarPerfil");
-	}
+		System.out.println("Todas las fotos han sido descargadas..\nDescargando Informacion..");
+		
+		File f = new File(path+"\\logs.txt");
 	
+        try (FileWriter fw = new FileWriter(f, true);
+                BufferedWriter bw = new BufferedWriter(fw)) {
+
+        	bw.write("LocalDateTime="+LocalDateTime.now());
+        	bw.newLine();
+        	
+        	bw.write("Username="+user);
+            bw.newLine(); // Salto de línea tras el texto agregado
+            
+        	bw.write("Followers="+seguidores);
+        	bw.newLine();
+        	
+        	bw.write("Following="+siguiendo);
+        	bw.newLine();
+            
+            bw.flush();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Fin DescargarPerfil()");
+	}
+	private void analizarPerfil(String username) {
+		System.out.println("Inicio de analizarPerfil");
+		List<WebElement> spanE = driver.findElements(By.className("_ac2a"));
+		System.out.println("Tamaño spanE"+spanE.size());
+		
+		posts = spanE.get(0).getText();
+		seguidores = spanE.get(1).getText(); 
+		siguiendo = spanE.get(2).getText();
+		System.out.println("Fin de analizarPerfil()");
+		
+		
+		/*
+		String bion[] = new String[3];
+		// Recorremos la lista de elementos span
+		for (int i=0; i<spanE.size(); i++) {
+			System.out.println(i+" "+spanE.get(i).getText());
+			bion[i] = spanE.get(i).getText();
+		}
+		*/
+	}
 }

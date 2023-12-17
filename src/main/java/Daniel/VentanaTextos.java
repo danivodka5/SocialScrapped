@@ -22,7 +22,7 @@ public class VentanaTextos extends JFrame {
         }
         
         for (int i=0; i<modelo.getSize(); i++) {
-        	JLabel text = new JLabel("TikTok "+modelo.getElementAt(i));
+        	JLabel text = new JLabel("saborajackydaniels "+modelo.getElementAt(i));
         	text.setFont(new Font(modelo.getElementAt(i),Font.PLAIN, 20));
         	panel.add(text);
         	panel.add(Box.createRigidArea(new Dimension(0, 10)));

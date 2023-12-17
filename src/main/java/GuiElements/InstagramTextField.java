@@ -1,6 +1,7 @@
 package GuiElements;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
@@ -19,7 +20,7 @@ public class InstagramTextField extends JTextField {
 	public InstagramTextField() {
 
 		//setOpaque(false); //?
-		
+		setFont(new Font("Arial", Font.PLAIN, 19));
 		setColumns(20);
 		
 		// Borde Exterior

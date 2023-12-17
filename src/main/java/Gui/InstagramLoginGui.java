@@ -42,13 +42,14 @@ public class InstagramLoginGui {
 	private Boton btnlogin;
 	private JLabel labelgif;
 	private JLabel labeladv;
+	
+	private ChromeDriver driver;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					// Bug, si el ordenador esta con la fecha incorrecta no se abre
-					
 					ChromeDriver driver = new ChromeDriver();
 					String url = "https://www.instagram.com/accounts/login/";	
 					driver.get(url);
@@ -65,7 +66,9 @@ public class InstagramLoginGui {
 						}
 					}	
 					InstagramLoginGui window = new InstagramLoginGui(driver);
-					window.frame.setVisible(true);
+					
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -78,25 +81,39 @@ public class InstagramLoginGui {
 	}
 	private void initialize(final ChromeDriver driver) {	
 		frame = new JFrame();
+		frame.setVisible(true);
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().setBackground(new Color(255, 255, 255));
-		frame.setBounds(100, 100, 366, 333);
+		// width,height
+		frame.setBounds(100, 100, 548, 535);
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
+		// Buscar todos los chromedriver y eliminarlos del administrador de tareas
+		// https://stackoverflow.com/questions/21320837/release-selenium-chromedriver-exe-from-memory
+		// https://stackoverflow.com/questions/41315488/do-something-when-the-close-button-is-clicked-on-a-jframe-need-clarification
+		
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                System.out.println("Cerrar programa");
+            }
+        });
+		
 		// Boton Login
 		btnlogin = new Boton("Entrar",new Color(112,196,240),new Color(0,149,246));
-		btnlogin.setFont(new Font("Arial", Font.BOLD, 12));
-		btnlogin.setBounds(39, 202, 269, 32);
+		btnlogin.setFont(new Font("Arial", Font.BOLD, 20));
+		btnlogin.setBounds(39, 300, 435, 50);
     	btnlogin.setEnabled(false);
     	btnlogin.setText("<html><font color = white>Entrar</font></html>");
     	
 		t1 = new InstagramTextField();
-		t1.setBounds(39,106,270,37);
+		t1.setBounds(39,159,435,58);
 		
 		p1 = new InstagramPasswordField();
-		p1.setBounds(39, 151, 270, 37);
+		p1.setBounds(39, 226, 435, 57);
 		
 		p1.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -149,8 +166,8 @@ public class InstagramLoginGui {
 		});
 		
 		labelgif = new JLabel();
-		labelgif.setBounds(156, 202, 37, 31);
-		ImageIcon loading = new ImageIcon(InstagramLoginGui.class.getResource("/Images/loadingblue2.gif"));
+		labelgif.setBounds(227, 302, 60, 47);
+		ImageIcon loading = new ImageIcon(InstagramLoginGui.class.getResource("/Images/loadingblue3.gif"));
 		loading.setImage(loading.getImage().getScaledInstance(labelgif.getWidth(), labelgif.getHeight()+10, Image.SCALE_DEFAULT));
 		labelgif.setIcon(loading);
 		
@@ -163,11 +180,15 @@ public class InstagramLoginGui {
 		frame.getContentPane().add(t1);
 		
 		labeladv = new JLabel("");
-		labeladv.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		labeladv.setBounds(39, 244, 269, 31);
+		labeladv.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		labeladv.setBounds(109, 385, 311, 110);
 		labeladv.setForeground(Color.red);
+		//labeladv.setText(String.format("<html><body style=\"text-align: justify;  text-justify: inter-word;\">%s</body></html>", "Tu contraseña no es correcta. Compruébala."));
 		frame.getContentPane().add(labeladv);
-			
+		
+		
+		
+		
 		btnlogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -197,18 +218,20 @@ public class InstagramLoginGui {
 								p1.setText("");				// Limpiamos el campo de pass
 								labelgif.setVisible(false);
 								condicion = false;
-								btnlogin.setBooleanBlocked(false);
 								
 								// Inicio de sesion correcto
 								if (driver.getCurrentUrl().contains("next=%2F")) {
 									labeladv.setForeground(Color.green);
 									labeladv.setText("Login Correcto");
-									chooseUser user = new chooseUser(driver);
-									frame.setVisible(false); // you can't see me!
-									frame.dispose(); 	     // Destroy the JFrame object
+									
+									UserGui ug = new UserGui(driver);
+									frame.setVisible(false); 
+									//frame.dispose(); 	     // Destroy the JFrame object
 								} else {
 									WebElement inc = driver.findElement(By.className("_ab2z"));
 									labeladv.setText(inc.getText());
+									// btnlogin.setBooleanBlocked(false);
+									
 								}
 							}
 						}

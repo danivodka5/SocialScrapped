@@ -15,32 +15,31 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import GuiElements.Boton;
 import GuiElements.BotonPanel;
 import GuiElements.UserGuiSearchBar;
 import GuiElements.UserPanel;
-import WindowGui.chooseUser;
 
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JTextField;
-import javax.swing.JRadioButton;
+
 import java.awt.Font;
 
 public class UserGui {
-
+	// Atributos
 	private JFrame frame;
 	private ImageIcon icon1;
+	
 	private UserGuiSearchBar ugsb;
 	private Boton btnbuscar;
+	
+	private ChromeDriver driver;
+	private String user;
 
-	/**
-	 * Launch the application.
-	 */
+	/*
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -53,24 +52,27 @@ public class UserGui {
 			}
 		});
 	}
-
-	/**
-	 * Create the application.
-	 */
+	*/
+	// Constructor
+	public UserGui(ChromeDriver driver) {
+		this.driver = driver;
+		initialize();
+	}
+	
+	// Constructor testing
 	public UserGui() {
 		initialize();
 	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
+	
+	// Metodo Inicial
 	private void initialize() {
 		frame = new JFrame();
+		frame.setVisible(true);
 		frame.getContentPane().setBackground(new Color(255, 255, 255));
 		frame.getContentPane().setForeground(new Color(255, 255, 255));
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
-		frame.setBounds(100, 100, 384, 421);
+		frame.setBounds(100, 100, 470, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -108,15 +110,10 @@ public class UserGui {
 		frame.getContentPane().add(userpanel);
 		
 		ugsb = new UserGuiSearchBar();
-		ugsb.setBounds(21, 38, 240, 34);
+		ugsb.setVisible(true);
+		ugsb.setBounds(21, 29, 276, 46);
 		frame.getContentPane().add(ugsb);
-		
-		btnbuscar = new Boton("Buscar", new Color(112, 196, 240), new Color(0, 149, 246));
-		btnbuscar.setText("<html><font color = white>Buscar</font></html>");
-		btnbuscar.setFont(new Font("Arial", Font.BOLD, 12));
-		btnbuscar.setBounds(276, 38, 84, 34);
-		frame.getContentPane().add(btnbuscar);		
-		
+				
 		JButton btnNewButton = new JButton("Descargar Perfil");
 		btnNewButton.setBounds(51, 116, 259, 34);
 		frame.getContentPane().add(btnNewButton);
@@ -147,8 +144,28 @@ public class UserGui {
                 }
             }
 		});
-	
 		
-
+		// Boton buscar
+		btnbuscar = new Boton("Buscar", new Color(112, 196, 240), new Color(0, 149, 246));
+		btnbuscar.setVisible(true);
+		btnbuscar.setText("<html><font color = white>Buscar</font></html>");
+		btnbuscar.setFont(new Font("Arial", Font.BOLD, 20));
+		btnbuscar.setBounds(307, 29, 127, 46);
+		btnbuscar.setEnabled(false);
+		
+		// Metodo boton buscar
+		btnbuscar.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("me pulsaron");
+				user = ugsb.getText();
+				ejecutarBusqueda(user);
+			}
+		});
+		frame.getContentPane().add(btnbuscar);		
 	}
+	private void ejecutarBusqueda(String username) {
+		driver.get("https://www.instagram.com/"+username);
+	}
+	
 }

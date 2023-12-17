@@ -3,3 +3,6 @@ https://stackoverflow.com/questions/11001030/how-i-can-check-whether-a-page-is-l
 
 // Encontrar todo el texto de la pagina web (muy util)
 WebElement numeros = driver.findElement(By.xpath("*"));
+
+// Localizar cuando un elemento cambia de estilo
+https://stackoverflow.com/questions/18452790/how-to-using-webdriver-selenium-to-get-the-value-of-style-element
