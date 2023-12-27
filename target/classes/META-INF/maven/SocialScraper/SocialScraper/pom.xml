@@ -12,12 +12,25 @@
     	<version>4.11.0</version>
 	</dependency>
 
-
 	<dependency>
-		<groupId>Bonolots</groupId>
-		<artifactId>Bonolots</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+    	<groupId>org.openjfx</groupId>
+    	<artifactId>javafx-controls</artifactId>
+    	<version>21.0.1</version>
 	</dependency>
+
   </dependencies>
+  	<!-- JAVAFX maven -->
+      <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>21.0.1</version>
+                <configuration>
+                    <mainClass>Gui.UserGui</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     
 </project>

@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -27,17 +28,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import java.awt.Font;
+import java.awt.GridLayout;
+import javax.swing.JTextField;
+import java.awt.FlowLayout;
 
 public class UserGui {
 	// Atributos
 	private JFrame frame;
 	private ImageIcon icon1;
 	
-	private UserGuiSearchBar ugsb;
-	private Boton btnbuscar;
-	
 	private ChromeDriver driver;
 	private String user;
+	private JTextField textField;
 
 	
 	public static void main(String[] args) {
@@ -70,105 +72,59 @@ public class UserGui {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setVisible(true);
-		frame.getContentPane().setBackground(new Color(255, 255, 255));
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
-		frame.setBounds(100, 100, 470, 700);
+		frame.setBounds(100, 100, 768, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		// ERROR CAUSADO POR ->>>>>>>>
 		frame.getContentPane().setLayout(null);
 		
-		final JLabel labelZoom = new JLabel("");
-		labelZoom.setBounds(21, 340, 35, 34);
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(255, 255, 255));
+		panel.setBounds(0, 0, 754, 652);
+		panel.setLayout(null);
+		frame.getContentPane().add(panel);
 		
-		icon1 = new ImageIcon(InstagramLoginGui.class.getResource("/Images/ZoomInsta2.png"));
 		
-		ImageIcon temp1 = icon1;
-		temp1.setImage(temp1.getImage().getScaledInstance(labelZoom.getWidth(), labelZoom.getHeight(), Image.SCALE_SMOOTH));
-		labelZoom.setIcon(temp1);
-		frame.getContentPane().add(labelZoom);
-	
-		BotonPanel bp = new BotonPanel();
-		bp.setBounds(19, 339, 40, 37);
+		UserGuiSearchBar ugsb = new UserGuiSearchBar();
+		ugsb.setBounds(27, 21, 264, 45);
+		panel.add(ugsb);
+		ugsb.setColumns(10);
 		
-		bp.addMouseListener(new MouseAdapter() {
-		    public void mouseEntered(java.awt.event.MouseEvent evt) {
-		    	labelZoom.setBounds(0, 0, 300, 300);
-		    	
-		    	ImageIcon temp2 = icon1;
-		    	temp2.setImage(temp2.getImage().getScaledInstance(labelZoom.getWidth(), labelZoom.getHeight(), Image.SCALE_SMOOTH));    	
-		    	labelZoom.setIcon(icon1);
-
-		    }
-		    public void mouseExited(java.awt.event.MouseEvent evt) {
-		    	labelZoom.setBounds(20, 341, 35, 34);
-		    }
-		});
-		frame.getContentPane().add(bp);
-
-		UserPanel userpanel = new UserPanel();
-		userpanel.setBounds(0, 331, 370, 53);
-		userpanel.setLayout(null);
-		frame.getContentPane().add(userpanel);
+		// Boton Buscar Perfil
+		Boton bsearch = new Boton("Buscar",new Color(112,196,240),new Color(0,149,246));
+		bsearch.setFont(new Font("Arial", Font.BOLD, 18));
+		bsearch.setBounds(317, 21, 101, 45);
+		bsearch.setEnabled(false);
+		bsearch.setText("<html><font color = white>Buscar</font></html>");
+		panel.add(bsearch);	
 		
-		ugsb = new UserGuiSearchBar();
-		ugsb.setVisible(true);
-		ugsb.setBounds(21, 29, 276, 46);
-		frame.getContentPane().add(ugsb);
-				
-		JButton btnNewButton = new JButton("Descargar Perfil");
-		btnNewButton.setBounds(51, 116, 259, 34);
-		frame.getContentPane().add(btnNewButton);
+		JPanel panel_1 = new JPanel();
+		panel_1.setBounds(0, 254, 754, 398);
+		panel.add(panel_1);
+		panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		ugsb.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				checkEnableButton();
-			}
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				checkEnableButton();
-			}
-			@Override
-			public void changedUpdate(DocumentEvent e) {	
-				checkEnableButton();
-			}
-            private void checkEnableButton() {
-                if (ugsb.getText().length() > 0) {
-                	System.out.println("me activo");
-                	btnbuscar.setBooleanEmpty(false);
-                	btnbuscar.setEnabled(true);
-                	btnbuscar.setCursor(true);
-                } else {
-                	btnbuscar.setBooleanEmpty(true);
-                	btnbuscar.setEnabled(false);
-                	btnbuscar.setCursor(false);                	
-                }
-            }
-		});
 		
-		// Boton buscar
-		btnbuscar = new Boton("Buscar", new Color(112, 196, 240), new Color(0, 149, 246));
-		btnbuscar.setVisible(true);
-		btnbuscar.setText("<html><font color = white>Buscar</font></html>");
-		btnbuscar.setFont(new Font("Arial", Font.BOLD, 20));
-		btnbuscar.setBounds(307, 29, 127, 46);
-		btnbuscar.setEnabled(false);
-		
-		// Metodo boton buscar
-		btnbuscar.addActionListener(new ActionListener(){
-			@Override
+		// Boton Descargar Perfil
+		Boton bdp = new Boton("Descargar", new Color(112, 196, 240), new Color(0, 149, 246));
+		bdp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("me pulsaron");
-				user = ugsb.getText();
-				ejecutarBusqueda(user);
 			}
 		});
-		frame.getContentPane().add(btnbuscar);		
+		bdp.setText("<html><font color = white>Descargar</font></html>");
+		bdp.setFont(new Font("Arial", Font.BOLD, 18));
+		bdp.setEnabled(false);
+		panel_1.add(bdp);
+		
+		Boton bsearch_2 = new Boton("Buscar", new Color(112, 196, 240), new Color(0, 149, 246));
+		bsearch_2.setText("<html><font color = white>Buscar</font></html>");
+		bsearch_2.setFont(new Font("Arial", Font.BOLD, 18));
+		bsearch_2.setEnabled(false);
+		panel_1.add(bsearch_2);
+			
+
+		
 	}
 	private void ejecutarBusqueda(String username) {
 		driver.get("https://www.instagram.com/"+username);
 	}
-	
 }
