@@ -39,24 +39,26 @@ public class UserGui {
 	private ChromeDriver driver;
 	private String user;
 
-	/*
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					UserGui window = new UserGui();
-					window.frame.setVisible(true);
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
-	*/
+	
+	
 	// Constructor
 	public UserGui(ChromeDriver driver) {
 		this.driver = driver;
 		initialize();
+		
 	}
 	
 	// Constructor testing
@@ -69,11 +71,12 @@ public class UserGui {
 		frame = new JFrame();
 		frame.setVisible(true);
 		frame.getContentPane().setBackground(new Color(255, 255, 255));
-		frame.getContentPane().setForeground(new Color(255, 255, 255));
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setBounds(100, 100, 470, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// ERROR CAUSADO POR ->>>>>>>>
 		frame.getContentPane().setLayout(null);
 		
 		final JLabel labelZoom = new JLabel("");

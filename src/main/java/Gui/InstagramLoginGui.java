@@ -89,7 +89,7 @@ public class InstagramLoginGui {
 		frame.setBounds(100, 100, 548, 535);
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		//frame.getContentPane().setLayout(null);
 		
 		// Buscar todos los chromedriver y eliminarlos del administrador de tareas
 		// https://stackoverflow.com/questions/21320837/release-selenium-chromedriver-exe-from-memory
@@ -187,8 +187,6 @@ public class InstagramLoginGui {
 		frame.getContentPane().add(labeladv);
 		
 		
-		
-		
 		btnlogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -214,8 +212,7 @@ public class InstagramLoginGui {
 								driver.findElement(By.xpath("//div[@role='progressbar']"));
 								System.out.println("-- Cargando ---");
 							} catch(Exception e) {
-								t1.setText("");				// Limpiamos el campo de usuario
-								p1.setText("");				// Limpiamos el campo de pass
+								System.out.println("Pagina cargada al 100%");
 								labelgif.setVisible(false);
 								condicion = false;
 								
@@ -225,9 +222,11 @@ public class InstagramLoginGui {
 									labeladv.setText("Login Correcto");
 									
 									UserGui ug = new UserGui(driver);
+									
 									frame.setVisible(false); 
-									//frame.dispose(); 	     // Destroy the JFrame object
+									frame.dispose(); 	     // Destroy the JFrame object
 								} else {
+									
 									WebElement inc = driver.findElement(By.className("_ab2z"));
 									labeladv.setText(inc.getText());
 									// btnlogin.setBooleanBlocked(false);
@@ -254,10 +253,10 @@ public ChromeDriver metodoDriver(ChromeDriver driver) {
 		campoa.sendKeys(t1.getText());
 		campob.sendKeys(new String(p1.getPassword()));
 		campoa.sendKeys(Keys.ENTER);
-		/*
+		
 		t1.setText("");				// Limpiamos el campo de usuario
 		p1.setText("");				// Limpiamos el campo de pass
-		*/
+		
 		return driver;
 	}
 }

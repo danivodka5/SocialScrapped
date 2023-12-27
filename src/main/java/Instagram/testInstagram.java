@@ -2,6 +2,8 @@ package Instagram;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
+
+import Gui.UserGui;
 import WindowGui.windowGui;
 
 public class testInstagram {	
@@ -19,6 +21,7 @@ public class testInstagram {
 		
 		if (!cookies) {
 			windowGui wg = new windowGui(driver);
+			UserGui ug = new UserGui(driver);
 		}
 	}
 	private static void iniciar() {
