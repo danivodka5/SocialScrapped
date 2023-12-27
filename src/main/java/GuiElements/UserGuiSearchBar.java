@@ -17,7 +17,6 @@ public class UserGuiSearchBar extends JTextField {
 	private Color color = new Color(239,239,239);
 	
 	public UserGuiSearchBar() {
-		
 		// Hace el campo de texto transparente para ver el fondo
 		setOpaque(false);
 		
@@ -32,8 +31,6 @@ public class UserGuiSearchBar extends JTextField {
 		// Suma de Bordes
 		Border b3 = BorderFactory.createCompoundBorder(b1,b2);	
 		setBorder(b3);
-		
-		
 	}
 	@Override
     protected void paintComponent(Graphics g) {

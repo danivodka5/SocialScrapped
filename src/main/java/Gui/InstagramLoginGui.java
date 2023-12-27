@@ -222,7 +222,7 @@ public class InstagramLoginGui {
 									labeladv.setText("Login Correcto");
 									
 									UserGui ug = new UserGui(driver);
-									
+																	
 									frame.setVisible(false); 
 									frame.dispose(); 	     // Destroy the JFrame object
 								} else {
