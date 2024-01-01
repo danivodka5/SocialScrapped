@@ -226,7 +226,6 @@ public class InstagramLoginGui {
 									frame.setVisible(false); 
 									frame.dispose(); 	     // Destroy the JFrame object
 								} else {
-									
 									WebElement inc = driver.findElement(By.className("_ab2z"));
 									labeladv.setText(inc.getText());
 									// btnlogin.setBooleanBlocked(false);
@@ -237,7 +236,7 @@ public class InstagramLoginGui {
 					}
 				});
 				loginDriver.start();
-				loginGif.start();
+				loginGif.start();		
 			}			
 		});	
 	}

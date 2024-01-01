@@ -15,6 +15,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import GuiElements.Boton;
@@ -51,6 +52,9 @@ public class UserGui {
 	private String user;
 	
 	private UserPanel userpanel;
+	
+	private boolean searching;
+	private JLabel labelNotFound;
 
 	
 	public static void main(String[] args) {
@@ -109,6 +113,12 @@ public class UserGui {
 		ugsb.setHorizontalAlignment(SwingConstants.CENTER);
 		ugsb.setColumns(15);
 		
+		// Label Not found
+		labelNotFound = new JLabel("");
+		labelNotFound.setBounds(64, 149, 294, 38);
+		labelNotFound.setVisible(false);
+		frame.getContentPane().add(labelNotFound);
+		
 		// Boton buscar
 		btnbuscar = new Boton("Buscar", new Color(112, 196, 240), new Color(0, 149, 246));
 		btnbuscar.setBounds(322, 26, 95, 40);
@@ -145,7 +155,6 @@ public class UserGui {
 			}
             private void checkEnableButton() {
                 if (ugsb.getText().length() > 0) {
-                	System.out.println("me activo");
                 	btnbuscar.setBooleanEmpty(false);
                 	btnbuscar.setEnabled(true);
                 	btnbuscar.setCursor(true);
@@ -167,6 +176,7 @@ public class UserGui {
 			temp1.setImage(temp1.getImage().getScaledInstance(labelZoom.getWidth(), labelZoom.getHeight(), Image.SCALE_SMOOTH));
 			labelZoom.setIcon(temp1);
 			
+			
 			bp.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(java.awt.event.MouseEvent evt) {
 			    	labelZoom.setBounds(0, 0, 300, 300);
@@ -183,8 +193,61 @@ public class UserGui {
 	}
 	private void ejecutarBusqueda(String username) {
 		driver.get("https://www.instagram.com/"+username);
+		System.out.println("Inicio del metodo ejecutarBusqueda() usuario: "+username);
 		
-		// El usuario existe?
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		// Metodo para comprobar cuando la pagina ha cargado completamente
+		boolean loading = true;
+		while (loading) {
+			try {
+				Thread.sleep(100);
+				String status = (String) js.executeScript("return document.getElementById('splash-screen').style.display;");
+				if (status.equals("none")) {
+					loading = false;
+				}
+			} catch (InterruptedException e) { e.printStackTrace(); }
+		}
+
+		System.out.println("Usuario Cargado ");
 		
+		// El usuario existe?	
+		boolean userExists = (boolean) js.executeScript("const userl = document.getElementsByClassName('x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh xbxaen2 x1u72gb5 x1t1ogtf x13zrc24 x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh xl56j7k')[0]; if (typeof userl !== 'undefined') { return(false); } else { return (true); }");
+		
+		if (userExists) {
+			System.out.println("El usuario existe");
+			
+		} else {
+			System.out.println("El usuario no existe");
+			String adv = (String) js.executeScript("return document.getElementsByClassName('x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh xbxaen2 x1u72gb5 x1t1ogtf x13zrc24 x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh xl56j7k')[0].textContent;");
+			System.out.println("adv ="+adv);
+			labelNotFound.setText(adv);
+			labelNotFound.setVisible(true);
+		}
+				
+		Thread userFound = new Thread(new Runnable() {
+			 @Override
+			 public void run() {
+						try {
+							JavascriptExecutor js = (JavascriptExecutor) driver;
+							// Title
+							System.out.println("Titulo= "+js.executeScript("return document.getElementsByClassName('x1lliihq x1plvlek xryxfnj x1n2onr6 x193iq5w xeuugli x1fj9vlw x13faqbe x1vvkbs x1s928wv xhkezso x1gmr53x x1cpjm7i x1fgarty x1943h6x x1i0vuye xvs91rp x1s688f x5n08af x10wh9bi x1wdrske x8viiok x18hxmgj')[0].textContent;"));
+							
+							// Biography
+							String scriptBio = "const bio = document.getElementsByClassName('_ap3a _aaco _aacu _aacx _aad6 _aade')[0];";
+							String script2 = "if (typeof bio !== 'undefined') {return (bio.textContent);} else {return ''};";
+							String res = (String) js.executeScript(scriptBio+script2);
+							System.out.println("Bio = "+res);
+							
+							// URL
+							//js = (JavascriptExecutor) driver;
+							String scriptURL = "const url =  document.getElementsByClassName('x3nfvp2')[6].getElementsByTagName('a')[0]; if (typeof url !== 'undefined'){return (url.textContent);} else {return ''}";
+							System.out.println("URL="+js.executeScript(scriptURL));
+							
+						}catch (Exception e) {
+
+						}		 
+			 }
+		});	
+		userFound.start();
 	}
 }
