@@ -55,20 +55,23 @@ public class InstagramLoginGui {
 					driver.get(url);
 
 					boolean cookies = true;
+					int trys = 0;
 					while (cookies){
 						try {
 							Thread.sleep(1000);
 							System.out.println("Cookies localizadas, rechazando..");
 							driver.findElement(By.cssSelector("button[class='_a9-- _ap36 _a9_1']")).click();
 							cookies = false;
+							InstagramLoginGui window = new InstagramLoginGui(driver);
 						} catch (Exception e) {
-							System.out.println("No se pudo rechazar las cookies");
+							trys++;	
+							System.out.println("No se pudo rechazar las cookies "+trys);
 						}
-					}	
-					InstagramLoginGui window = new InstagramLoginGui(driver);
-					
-					
-					
+						if (trys > 5) {
+							cookies = false;
+							System.out.println("\nNo se pudo arrancar el programa");
+						}
+					}								
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -7,6 +7,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -15,13 +17,16 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.w3c.dom.NodeList;
 
 import GuiElements.Boton;
 import GuiElements.BotonPanel;
 import GuiElements.UserGuiSearchBar;
 import GuiElements.UserPanel;
+import io.opentelemetry.exporter.logging.SystemOutLogRecordExporter;
 
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
@@ -115,7 +120,7 @@ public class UserGui {
 		
 		// Label Not found
 		labelNotFound = new JLabel("");
-		labelNotFound.setBounds(64, 149, 294, 38);
+		labelNotFound.setBounds(64, 149, 328, 246);
 		labelNotFound.setVisible(false);
 		frame.getContentPane().add(labelNotFound);
 		
@@ -134,9 +139,9 @@ public class UserGui {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("me pulsaron");
 				user = ugsb.getText();
-				ejecutarBusqueda(user);
+				ejecutarBusqueda();
 				
-				
+			
 			}
 		});
 		
@@ -177,6 +182,7 @@ public class UserGui {
 			labelZoom.setIcon(temp1);
 			
 			
+			
 			bp.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(java.awt.event.MouseEvent evt) {
 			    	labelZoom.setBounds(0, 0, 300, 300);
@@ -191,9 +197,9 @@ public class UserGui {
 			    }
 			});
 	}
-	private void ejecutarBusqueda(String username) {
-		driver.get("https://www.instagram.com/"+username);
-		System.out.println("Inicio del metodo ejecutarBusqueda() usuario: "+username);
+	private void ejecutarBusqueda() {
+		driver.get("https://www.instagram.com/"+user);
+		System.out.println("Inicio del metodo ejecutarBusqueda() usuario: "+user);
 		
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		// Metodo para comprobar cuando la pagina ha cargado completamente
@@ -216,6 +222,9 @@ public class UserGui {
 		if (userExists) {
 			System.out.println("El usuario existe");
 			
+			System.out.println("Iniciamos metodo analizarFollowers");
+			analizarFollowers();
+			
 		} else {
 			System.out.println("El usuario no existe");
 			String adv = (String) js.executeScript("return document.getElementsByClassName('x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh xbxaen2 x1u72gb5 x1t1ogtf x13zrc24 x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh xl56j7k')[0].textContent;");
@@ -223,7 +232,8 @@ public class UserGui {
 			labelNotFound.setText(adv);
 			labelNotFound.setVisible(true);
 		}
-				
+	
+	
 		Thread userFound = new Thread(new Runnable() {
 			 @Override
 			 public void run() {
@@ -243,11 +253,94 @@ public class UserGui {
 							String scriptURL = "const url =  document.getElementsByClassName('x3nfvp2')[6].getElementsByTagName('a')[0]; if (typeof url !== 'undefined'){return (url.textContent);} else {return ''}";
 							System.out.println("URL="+js.executeScript(scriptURL));
 							
+							
 						}catch (Exception e) {
 
 						}		 
 			 }
 		});	
-		userFound.start();
+		//userFound.start();
+
+	}
+	private void analizarFollowers() {
+		System.out.println("Iniciando metodo analizar Followers() ");
+		driver.get("https://www.instagram.com/"+user+"/followers/");
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		
+		// Buscamos si se ha abierto el div
+		boolean loading = true;
+		while (loading) {
+			loading = loadingFollows(js);
+			
+		}
+		
+		// Nosotros siempre seremos el primer seguidor
+		System.out.println("\n\nSegunda etapa del metodo--");
+		
+		int t = 0;
+		loading = true;
+		while (loading) {
+			try {		/*
+				
+				String sc = "const scrollBar = document.getElementsByClassName('_aano')[0];  let childrenbar = scrollBar.firstChild.firstChild.childNodes; return(childrenbar.length)";		
+				int seguidores = (int) js.executeScript(sc);
+				System.out.println("Seguidores = "+seguidores);
+				*/
+				Thread.sleep(150);
+				js.executeScript("const scrollBar = document.getElementsByClassName('_aano')[0];  scrollBar.scrollTop = scrollBar.scrollHeight; ");	
+				driver.findElement(By.xpath("//div[@class='x78zum5 xdt5ytf xl56j7k']"));		
+				System.out.println("Cargando barra");
+				//int ref = (int) js.executeScript(sc);
+				/*
+				if (seguidores != ref) {
+					System.out.println("Seguidores = "+ref);
+				}
+				*/
+				
+				t = 0;
+			}catch (Exception e) {
+				System.out.println("No se ha encontrado el final");
+				t++;
+				if (t > 6) {
+					// Intentar almacenar los followers como un array.
+					loading = false;
+					
+					int segn =  ((Long) js.executeScript("let container = document.getElementsByClassName('_aano')[0]; let childrenbar = container.firstChild.firstChild.childNodes; let f = []; for (let i=0; i<childrenbar.length; i++) { f[i] = childrenbar[i].firstChild.firstChild.firstChild.childNodes[1].firstChild.firstChild.firstChild.firstChild.textContent; } return(f.length);")).intValue();
+					
+					System.out.println("segn "+segn);
+					String sega[] = new String[segn];
+
+					String segscript = "let container = document.getElementsByClassName('_aano')[0]; let childrenbar = container.firstChild.firstChild.childNodes; let f = []; for (let i=0; i<childrenbar.length; i++) { f[i] = childrenbar[i].firstChild.firstChild.firstChild.childNodes[1].firstChild.firstChild.firstChild.firstChild.textContent; }";	
+
+					for(int i=0; i<segn; i++) {
+						sega[i] = (String) js.executeScript(segscript+"return(f["+i+"]"+");");
+					}	
+					System.out.println("fin de coleccion");
+					for(int i=0; i<segn; i++) {
+						System.out.println("usuario "+sega[i]);
+					}
+					
+				}
+			}
+		}
+	}
+
+	private boolean loadingFollows(JavascriptExecutor js) {
+		try {
+			Thread.sleep(900);
+			driver.findElement(By.xpath("//div[contains(@class, 'x1n2onr6 xzkaem6')]"));
+			String sname = "return (document.getElementsByClassName('_aano')[0].firstChild.firstChild.firstChild.firstChild.childNodes[0].firstChild.childNodes[1].firstChild.firstChild.firstChild.textContent);";
+			String snamejs = (String) js.executeScript(sname);
+			
+			// Una vez aparezca el div
+			if (snamejs.length() > 1) {
+				System.out.println("El Menu ha cargado (hemos encontrado el div)"+ snamejs);
+				return false;
+			}
+		} catch (Exception e) {
+			System.out.println("Menu Followers cargando...");
+			return true;
+		}
+		return true;
 	}
 }
