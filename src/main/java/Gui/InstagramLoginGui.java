@@ -6,25 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-
-import java.awt.Dimension;
-
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
+
 import java.awt.Color;
 import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import java.awt.Font;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -32,7 +23,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import GuiElements.Boton;
 import GuiElements.InstagramPasswordField;
 import GuiElements.InstagramTextField;
-import WindowGui.chooseUser;
+import MySQL.Conexion;
 
 public class InstagramLoginGui {
 
@@ -41,9 +32,20 @@ public class InstagramLoginGui {
 	private JPasswordField p1;
 	private Boton btnlogin;
 	private JLabel labelgif;
-	private JLabel labeladv;
+	
+	private InstagramTextField ip;
+	private InstagramTextField port;
+	private InstagramTextField user;
+	private InstagramTextField p;
+	
+	private Boton btnmysql;
+	private JLabel labelip;
+	private JLabel labelport;
 	
 	private ChromeDriver driver;
+	private JLabel labelip_2;
+	private JLabel labelsql;
+	private Conexion conn;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -86,10 +88,11 @@ public class InstagramLoginGui {
 		frame = new JFrame();
 		frame.setVisible(true);
 		frame.setResizable(false);
+		
 		frame.setLocationRelativeTo(null);
 		frame.getContentPane().setBackground(new Color(255, 255, 255));
 		// width,height
-		frame.setBounds(100, 100, 548, 535);
+		frame.setBounds(100, 100, 550, 920);
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//frame.getContentPane().setLayout(null);
@@ -168,6 +171,8 @@ public class InstagramLoginGui {
             }
 		});
 		
+		
+		
 		labelgif = new JLabel();
 		labelgif.setBounds(227, 302, 60, 47);
 		ImageIcon loading = new ImageIcon(InstagramLoginGui.class.getResource("/Images/loadingblue3.gif"));
@@ -176,24 +181,108 @@ public class InstagramLoginGui {
 		
 		// Invisible
 		labelgif.setVisible(false);
+		frame.getContentPane().setLayout(null);
 		frame.getContentPane().add(labelgif);
 		
 		frame.getContentPane().add(btnlogin);
 		frame.getContentPane().add(p1);
 		frame.getContentPane().add(t1);
 		
-		labeladv = new JLabel("");
-		labeladv.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		labeladv.setBounds(109, 385, 311, 110);
-		labeladv.setForeground(Color.red);
-		//labeladv.setText(String.format("<html><body style=\"text-align: justify;  text-justify: inter-word;\">%s</body></html>", "Tu contraseña no es correcta. Compruébala."));
-		frame.getContentPane().add(labeladv);
+		ip = new InstagramTextField();
+		ip.setBounds(39, 570, 190, 58);
+		frame.getContentPane().add(ip);
 		
+		port = new InstagramTextField();
+		port.setBounds(361, 570, 114, 58);
+		frame.getContentPane().add(port);
 		
+		user = new InstagramTextField();
+		user.setBounds(39, 465, 190, 58);
+		frame.getContentPane().add(user);
+		
+		p = new InstagramTextField();
+		p.setBounds(284, 465, 190, 58);
+		frame.getContentPane().add(p);
+		
+		DocumentListener dlsql = new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				checkTextMysql();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				checkTextMysql();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				checkTextMysql();
+			}
+		};
+		
+		ip.getDocument().addDocumentListener(dlsql);
+		port.getDocument().addDocumentListener(dlsql);
+		user.getDocument().addDocumentListener(dlsql);
+		port.getDocument().addDocumentListener(dlsql);
+		
+		btnmysql = new Boton("Conectar MYSQL", new Color(112, 196, 240), new Color(0, 149, 246));
+		btnmysql.setText("<html><font color = white>Conectar MYSQL</font></html>");
+		btnmysql.setFont(new Font("Arial", Font.BOLD, 20));
+		btnmysql.setEnabled(false);
+		btnmysql.setBounds(39, 650, 435, 50);
+		frame.getContentPane().add(btnmysql);
+		
+		labelip = new JLabel("IP");
+		labelip.setBounds(39, 534, 60, 25);
+		labelip.setFont(new Font("Arial", Font.PLAIN, 19));
+		frame.getContentPane().add(labelip);
+		
+		labelport = new JLabel("PORT");
+		labelport .setFont(new Font("Arial", Font.PLAIN, 19));
+		labelport .setBounds(393, 534, 60, 25);
+		frame.getContentPane().add(labelport);
+	
+		
+		JLabel labelip_1 = new JLabel("USER");
+		labelip_1.setFont(new Font("Arial", Font.PLAIN, 19));
+		labelip_1.setBounds(39, 429, 60, 25);
+		frame.getContentPane().add(labelip_1);
+		
+		labelip_2 = new JLabel("PASSWORD");
+		labelip_2.setFont(new Font("Arial", Font.PLAIN, 19));
+		labelip_2.setBounds(284, 429, 147, 25);
+		frame.getContentPane().add(labelip_2);
+		
+		labelsql = new JLabel("");		
+		labelsql.setBounds(39, 750, 435, 82);
+		labelsql.setFont(new Font("Arial", Font.PLAIN, 19));
+		frame.getContentPane().add(labelsql);
+	
+		btnmysql.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				conn = new Conexion(ip.getText(),port.getText(),user.getText(),p.getText());
+				conn.connect();
+				
+				if (conn.isConnected()) {
+					labelsql.setText("<html>CONNECTED TO MYSQL<p>"+conn.createDatabaseIfNotExists()+"</p></html>");
+				} else {
+					labelsql.setText("ERROR CONNECTION");
+				}
+				
+				user.setText("");
+				p.setText("");
+				ip.setText("");
+				port.setText("");
+			}
+			
+		});
+			
 		btnlogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				labeladv.setText("");
+				//labeladv.setText("");
 				btnlogin.setBooleanBlocked(true);
 				System.out.println("Boton bloqueado");
 				
@@ -221,16 +310,20 @@ public class InstagramLoginGui {
 								
 								// Inicio de sesion correcto
 								if (driver.getCurrentUrl().contains("next=%2F")) {
-									labeladv.setForeground(Color.green);
-									labeladv.setText("Login Correcto");
+									//labeladv.setForeground(Color.green);
+									//labeladv.setText("Login Correcto");
 									
-									UserGui ug = new UserGui(driver);
-																	
+									if (conn != null) {
+										UserGui ug = new UserGui(driver,conn);									
+									} else {
+										UserGui ug = new UserGui(driver);		
+									}
+																								
 									frame.setVisible(false); 
 									frame.dispose(); 	     // Destroy the JFrame object
 								} else {
 									WebElement inc = driver.findElement(By.className("_ab2z"));
-									labeladv.setText(inc.getText());
+									//labeladv.setText(inc.getText());
 									// btnlogin.setBooleanBlocked(false);
 									
 								}
@@ -260,5 +353,16 @@ public ChromeDriver metodoDriver(ChromeDriver driver) {
 		p1.setText("");				// Limpiamos el campo de pass
 		
 		return driver;
+	}
+	private void checkTextMysql() {
+		if ((ip.getText().length() >6) && (port.getText().length() > 0) && (user.getText().length() > 0)) {
+        	btnmysql.setEnabled(true);
+        	btnmysql.setBooleanEmpty(false);
+        	btnmysql.setCursor(true);
+		} else {
+			btnmysql.setEnabled(false);
+			btnmysql.setBooleanEmpty(true);
+			btnmysql.setCursor(false);
+		}
 	}
 }
