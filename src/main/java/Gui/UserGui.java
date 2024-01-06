@@ -19,6 +19,7 @@ import javax.swing.event.DocumentListener;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.w3c.dom.NodeList;
 
@@ -61,6 +62,7 @@ public class UserGui {
 	
 	private UserPanel userpanel;
 	private JLabel labelNotFound;
+	private Conexion conn;
 
 
 	public static void main(String[] args) {
@@ -77,7 +79,7 @@ public class UserGui {
 	}
 	// Constructor
 	public UserGui(ChromeDriver driver, Conexion conn) {
-
+		this.conn = conn;
 		this.driver = driver;
 		initialize();
 	}
@@ -165,9 +167,10 @@ public class UserGui {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("me pulsaron");
 				user = ugsb.getText();
-				ejecutarBusqueda();
 				
-			
+				
+				//ejecutarBusqueda();
+				findInstagramStories();
 			}
 		});
 		
@@ -247,8 +250,17 @@ public class UserGui {
 			System.out.println("El usuario existe");
 			btnanuser.setEnabled(true);
 			btnanuser.setBooleanEmpty(false);
-			btnanuser.setCursor(true);     
+			btnanuser.setCursor(true);
 			
+			// Comprobamos si el usuario esta en la base de datos y de paso lo creamos
+			System.out.println(conn.doesUserExists(user));
+			
+			// CREAR USUARIO, ESCOGER USUARIO
+			if ((!(conn == null)) &&(!conn.doesUserExists(user))) {
+				System.out.println(conn.createUser(user));
+			}
+			
+					
 		} else {
 			System.out.println("El usuario no existe");
 			
@@ -318,7 +330,6 @@ public class UserGui {
 		loading = true;
 		while (loading) {
 			try {		/*
-				
 				String sc = "const scrollBar = document.getElementsByClassName('_aano')[0];  let childrenbar = scrollBar.firstChild.firstChild.childNodes; return(childrenbar.length)";		
 				int seguidores = (int) js.executeScript(sc);
 				System.out.println("Seguidores = "+seguidores);
@@ -379,5 +390,64 @@ public class UserGui {
 			return true;
 		}
 		return true;
+	}
+	
+	private void findInstagramStories() {
+		driver.get("https://www.instagram.com/stories/"+user);
+		System.out.println("Inicio del metodo testHistoriaInstagram usuario: "+user);
+		
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		// Metodo para comprobar cuando la pagina ha cargado completamente
+		boolean loading = true;
+		while (loading) {
+			try {
+				Thread.sleep(100);
+				String status = (String) js.executeScript("return document.getElementById('splash-screen').style.display;");
+				if (status.equals("none")) {
+					
+					WebElement verh = driver.findElement(By.xpath("//div[contains(@class, 'x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh xg87l8a x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh x1nhvcw1')]"));
+					verh.click();
+					System.out.println("Fin");
+					loading = false;
+				}
+			} catch (InterruptedException e) { System.out.println("Cargando.."); }
+		}
+
+		int nimg = ((Long) js.executeScript("let images = document.getElementsByTagName('img'); return images.length")).intValue();
+		System.out.println("Imagenes = "+nimg);
+		
+		loading = true;
+		
+		ArrayList<String> storysrc = new ArrayList<String>()
+				;
+		int cstories = 0;
+		while (loading) {
+			try {
+				// Y si es un video?
+				
+				// Primero obtenemos la foto
+				System.out.println("Foto encontrada");
+				storysrc.add((String)js.executeScript("let imgstories = document.getElementsByTagName('img'); "
+						+ "return(imgstories[3].src)"));
+				
+				
+				driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
+				//List<WebElement> divsvg = driver.findElements( By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']"));
+				//System.out.println(divsvg.size());
+				//divsvg.get(3).click();
+				cstories++;
+				Thread.sleep(2000);
+			}catch (Exception e) {
+				loading = false;
+			}
+		}
+		
+		System.out.println("Hay un total de "+cstories+" instagram stories ");
+		
+		System.out.println("Leyendo las direcciones =");
+		for (int i=0; i<storysrc.size(); i++) {
+			System.out.println("imagen "+i+" "+storysrc.get(i));
+		}
+		
 	}
 }
