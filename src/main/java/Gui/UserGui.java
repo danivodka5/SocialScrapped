@@ -262,8 +262,7 @@ public class UserGui {
 			
 					
 		} else {
-			System.out.println("El usuario no existe");
-			
+			System.out.println("El usuario no existe");	
         	btnanuser.setBooleanEmpty(true);
         	btnanuser.setEnabled(false);
         	btnanuser.setCursor(false);  
@@ -393,26 +392,52 @@ public class UserGui {
 	}
 	
 	private void findInstagramStories() {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		/*
+		 *  var performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; 
+			var network = performance.getEntries() || {}; 
+
+
+
+			for (let i=0; i<network.length;i++){
+				if (network[i].initiatorType == 'fetch'){
+				console.log(network[i]);
+			}
+			}
+
+		 */
+
+
+		//String script = "var performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {};  var network = performance.getEntries() || {}; for (let i=0; i<network.length;i++){ if (network[i].initiatorType == 'fetch'){  return(network["++"].name);	} }";
+	
 		driver.get("https://www.instagram.com/stories/"+user);
 		System.out.println("Inicio del metodo testHistoriaInstagram usuario: "+user);
 		
-		JavascriptExecutor js = (JavascriptExecutor) driver;
 		// Metodo para comprobar cuando la pagina ha cargado completamente
 		boolean loading = true;
 		while (loading) {
 			try {
 				Thread.sleep(100);
-				String status = (String) js.executeScript("return document.getElementById('splash-screen').style.display;");
+				String status = (String) js.executeScript("return document.getElementById('splash-screen').style.display;"); // ?
 				if (status.equals("none")) {
-					
-					WebElement verh = driver.findElement(By.xpath("//div[contains(@class, 'x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh xg87l8a x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh x1nhvcw1')]"));
-					verh.click();
-					System.out.println("Fin");
+					// Button See History
+					driver.findElement(By.xpath("//div[contains(@class, 'x9f619 xjbqb8w x78zum5 x168nmei x13lgxp2 x5pf9jr xo71vjh xg87l8a x1n2onr6 x1plvlek xryxfnj x1c4vz4f x2lah0s xdt5ytf xqjyukv x1qjc9v5 x1oa3qoh x1nhvcw1')]")).click();
+					System.out.println("See story as username clicked");
 					loading = false;
 				}
-			} catch (InterruptedException e) { System.out.println("Cargando.."); }
+			} catch (InterruptedException e) { 
+				System.out.println("No button See story as found"); 
+				loading = false;
+			}
 		}
 
+		/*
+		 * 					
+					// Numero de historias en el perfil
+					int l = ((Long) js.executeScript("return(document.getElementsByClassName('x1ned7t2 x78zum5')[0].childNodes.length)")).intValue();
+					System.out.println("Hay un total de "+l+" historias");
+		 */
+		
 		int nimg = ((Long) js.executeScript("let images = document.getElementsByTagName('img'); return images.length")).intValue();
 		System.out.println("Imagenes = "+nimg);
 		
@@ -423,7 +448,7 @@ public class UserGui {
 		int cstories = 0;
 		while (loading) {
 			try {
-				// Y si es un video?
+				// Mejor aun, cachear todo y descargar todo despues.
 				
 				// Primero obtenemos la foto
 				System.out.println("Foto encontrada");
