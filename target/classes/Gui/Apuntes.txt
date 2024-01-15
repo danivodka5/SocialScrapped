@@ -7,3 +7,8 @@
 
 // Cuando el post tiene una previsualizacion de contenido de visitas
 // El div cambia de nombre
+
+// Acceder al get de imagenes en stories
+// https://stackoverflow.com/questions/20401264/how-to-access-network-panel-on-google-chrome-developer-tools-with-selenium
+
+//

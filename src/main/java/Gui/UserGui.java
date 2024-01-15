@@ -414,6 +414,8 @@ public class UserGui {
 		System.out.println("Inicio del metodo testHistoriaInstagram usuario: "+user);
 		
 		// Metodo para comprobar cuando la pagina ha cargado completamente
+		// Al acceder a la storie mediante url se nos preguntara SIEMPRE si queremos visualizar la historia(mola).
+		// Debemos limpiar el array 
 		boolean loading = true;
 		while (loading) {
 			try {
@@ -438,41 +440,96 @@ public class UserGui {
 					System.out.println("Hay un total de "+l+" historias");
 		 */
 		
+		/*
 		int nimg = ((Long) js.executeScript("let images = document.getElementsByTagName('img'); return images.length")).intValue();
 		System.out.println("Imagenes = "+nimg);
+		*/
 		
 		loading = true;
+		ArrayList<String> storysrc = new ArrayList<String>();
+
+		// Numero de historias en el perfil = document.getElementsByClassName('x1ned7t2 x78zum5')[0].childNodes.length;
+		int l = ((Long) js.executeScript("return(document.getElementsByClassName('x1ned7t2 x78zum5')[0].childNodes.length)")).intValue();
+		System.out.println("Hay un total de "+l+" historias");
 		
-		ArrayList<String> storysrc = new ArrayList<String>()
-				;
-		int cstories = 0;
+		// Hay que comprobar que siempre empezamos por la primera story, hay situaciones en las que podemos empezar
+		// en otro lado.
 		while (loading) {
-			try {
-				// Mejor aun, cachear todo y descargar todo despues.
-				
-				// Primero obtenemos la foto
-				System.out.println("Foto encontrada");
-				storysrc.add((String)js.executeScript("let imgstories = document.getElementsByTagName('img'); "
-						+ "return(imgstories[3].src)"));
-				
-				
-				driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
-				//List<WebElement> divsvg = driver.findElements( By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']"));
-				//System.out.println(divsvg.size());
-				//divsvg.get(3).click();
-				cstories++;
-				Thread.sleep(2000);
-			}catch (Exception e) {
+			String currentUrl = driver.getCurrentUrl();
+			
+			System.out.println("Currenturl ="+currentUrl);
+			if (currentUrl.contains("stories")) {
+				try {
+					Thread.sleep(1000);
+					// Averiguamos en que historia estamos
+					int sp = ((Long) js.executeScript("let cn = document.getElementsByClassName('x1ned7t2 x78zum5')[0].childNodes; for (let i=0; i< cn.length; i++){ if (cn[i].childNodes.length == 1) return(i); }")).intValue();
+					sp +=1;
+					
+					System.out.println("Estoy en la story "+sp);
+					System.out.println("sp="+sp+" l="+l);
+					int res = ((Long) js.executeScript("return(document.getElementsByTagName('video').length);")).intValue();
+					if (sp == l) {
+						// Cuando llegemos a la ultima historia, tendremos todas las imagenes y videos cacheados
+						System.out.println("Estoy en la ultima story, hora de sacar la informacion");
+						
+						if (res == 1) {
+							driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(0).click();
+							System.out.println("Le he dado click a pausar video");
+							
+						} else {
+							// get(1) = Left Story Arrow
+							// get(2) = Like
+							// get(3) = Right Story Arrow
+							// get(4) = Exit?
+							// get(5) = Exit?
+							driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(6).click();
+							System.out.println("Le he dado click a pausar foto");
+						}
+						
+						int networkl = ((Long) js.executeScript("return(let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {};  let network = performance.getEntries() || {}; return(network.length);")).intValue();
+						System.out.println("Ejecutando el script...");
+						for(int i=0; i<networkl ;i++) {
+							String nscript = "let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; let network = performance.getEntries() || {}; if (network["+i+"].initiatorType == 'fetch'){ return(network["+i+"].name)} ";
+							storysrc.add((String) js.executeScript(nscript));
+						}
+						
+					} else {
+						// La historia es un video
+						if (res == 1) {
+							System.out.println("Esta historia  es un video");
+														
+							// Primero pregunto si esta el boton
+							String sbutton = "if ( document.getElementsByTagName('button').length > 0){	return true; }else { return false; }";
+
+							boolean isButton = (boolean) js.executeScript(sbutton);
+							System.out.println("CONDICION = "+isButton);
+							
+							if (isButton) {
+								driver.findElement(By.cssSelector("button[class='_ac0d']")).click();
+								System.out.println("Existia un boton derecho y le he dado click");
+							} else {
+								// FUNCIONA
+								driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
+								System.out.println("No existia boton, era svg y le he dado click");
+							}
+						}// La historia es una foto 
+						else {
+							System.out.println("Esta historia es una foto");
+							// Click to the right stories arrow
+							driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
+						}
+					}
+				}catch (Exception e) { System.out.println("\n\nError no encuentro la flecha"); }
+			} else {
 				loading = false;
 			}
+			
 		}
-		
-		System.out.println("Hay un total de "+cstories+" instagram stories ");
+		System.out.println("Hay un total de "+l+" instagram stories js");
 		
 		System.out.println("Leyendo las direcciones =");
 		for (int i=0; i<storysrc.size(); i++) {
 			System.out.println("imagen "+i+" "+storysrc.get(i));
 		}
-		
 	}
 }

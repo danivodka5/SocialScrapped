@@ -94,8 +94,6 @@ public class CRUD {
 		jpcuser.add(jb2, gbc);
 		
 		
-		
-		
 		panel.add(jpcuser, BorderLayout.CENTER);
 
 		
