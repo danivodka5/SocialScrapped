@@ -467,24 +467,26 @@ public class UserGui {
 					
 					System.out.println("Estoy en la story "+sp);
 					System.out.println("sp="+sp+" l="+l);
+					
+					// Primero pregunto si para pasar de storie, es un boton o un svg
+					String sbutton = "if ( document.getElementsByTagName('button').length > 0){	return true; }else { return false; }";
+					boolean isButton = (boolean) js.executeScript(sbutton);
+					System.out.println("CONDICION = "+isButton);
+					
 					int res = ((Long) js.executeScript("return(document.getElementsByTagName('video').length);")).intValue();
 					if (sp == l) {
 						// Cuando llegemos a la ultima historia, tendremos todas las imagenes y videos cacheados
 						System.out.println("Estoy en la ultima story, hora de sacar la informacion");
+					
+						// 
+						// 
+						// .get(0) Le da al sonido
+						// .get(1) se sale
 						
-						if (res == 1) {
-							driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(0).click();
-							System.out.println("Le he dado click a pausar video");
-							
-						} else {
-							// get(1) = Left Story Arrow
-							// get(2) = Like
-							// get(3) = Right Story Arrow
-							// get(4) = Exit?
-							// get(5) = Exit?
-							driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(6).click();
-							System.out.println("Le he dado click a pausar foto");
-						}
+						driver.findElements(By.xpath("//*[name()='div' and @class='x6s0dn4 x78zum5 xdt5ytf xl56j7k']")).get(0).click();
+						System.out.println("Le hemos dado a pause correctamente");
+						Thread.sleep(20000);
+						loading = false;
 						
 						int networkl = ((Long) js.executeScript("return(let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {};  let network = performance.getEntries() || {}; return(network.length);")).intValue();
 						System.out.println("Ejecutando el script...");
@@ -497,13 +499,6 @@ public class UserGui {
 						// La historia es un video
 						if (res == 1) {
 							System.out.println("Esta historia  es un video");
-														
-							// Primero pregunto si esta el boton
-							String sbutton = "if ( document.getElementsByTagName('button').length > 0){	return true; }else { return false; }";
-
-							boolean isButton = (boolean) js.executeScript(sbutton);
-							System.out.println("CONDICION = "+isButton);
-							
 							if (isButton) {
 								driver.findElement(By.cssSelector("button[class='_ac0d']")).click();
 								System.out.println("Existia un boton derecho y le he dado click");
@@ -515,8 +510,14 @@ public class UserGui {
 						}// La historia es una foto 
 						else {
 							System.out.println("Esta historia es una foto");
-							// Click to the right stories arrow
-							driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
+							if (isButton) {
+								driver.findElement(By.cssSelector("button[class='_ac0d']")).click();
+								System.out.println("Existia un boton derecho y le he dado click");
+							} else {
+								// FUNCIONA
+								driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
+								System.out.println("No existia boton, era svg y le he dado click");
+							}
 						}
 					}
 				}catch (Exception e) { System.out.println("\n\nError no encuentro la flecha"); }
