@@ -63,6 +63,8 @@ public class UserGui {
 	private UserPanel userpanel;
 	private JLabel labelNotFound;
 	private Conexion conn;
+	
+	private ArrayList<String> arrstorysrc = new ArrayList<>();
 
 
 	public static void main(String[] args) {
@@ -108,7 +110,7 @@ public class UserGui {
 		frame.setBounds(100, 100, 470, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		// ERROR CAUSADO POR ->>>>>>>>
+		// ERROR CAUSADO POR ->>>>>>>> ?
 		frame.getContentPane().setLayout(null);
 		
 		icon1 = new ImageIcon(InstagramLoginGui.class.getResource("/Images/ZoomInsta2.png"));
@@ -132,7 +134,6 @@ public class UserGui {
 		labelNotFound.setVisible(false);
 		frame.getContentPane().add(labelNotFound);
 		
-		
 		// Boton AnalizarUsuario
 		btnanuser = new Boton("Analizar Usuario", new Color(112, 196, 240), new Color(0, 149, 246));
 		btnanuser.setVisible(true);
@@ -150,7 +151,6 @@ public class UserGui {
 				
 			}			
 		});
-		
 		
 		// Boton buscar
 		btnbuscar = new Boton("Buscar", new Color(112, 196, 240), new Color(0, 149, 246));
@@ -307,7 +307,6 @@ public class UserGui {
 			System.out.println("error en "+e.getMessage());
 		}		
 		
-		
 	}
 	
 	private void analizarFollowers() {
@@ -446,7 +445,6 @@ public class UserGui {
 		*/
 		
 		loading = true;
-		ArrayList<String> storysrc = new ArrayList<String>();
 
 		// Numero de historias en el perfil = document.getElementsByClassName('x1ned7t2 x78zum5')[0].childNodes.length;
 		int l = ((Long) js.executeScript("return(document.getElementsByClassName('x1ned7t2 x78zum5')[0].childNodes.length)")).intValue();
@@ -469,68 +467,66 @@ public class UserGui {
 					System.out.println("sp="+sp+" l="+l);
 					
 					// Primero pregunto si para pasar de storie, es un boton o un svg
-					String sbutton = "if ( document.getElementsByTagName('button').length > 0){	return true; }else { return false; }";
+					String sbutton = "if ( document.getElementsByTagName('button').length > 0){	return true; } else { return false; }";
 					boolean isButton = (boolean) js.executeScript(sbutton);
-					System.out.println("CONDICION = "+isButton);
+					System.out.println("Hay boton? = "+isButton);
 					
 					int res = ((Long) js.executeScript("return(document.getElementsByTagName('video').length);")).intValue();
+					
+					
 					if (sp == l) {
 						// Cuando llegemos a la ultima historia, tendremos todas las imagenes y videos cacheados
 						System.out.println("Estoy en la ultima story, hora de sacar la informacion");
-					
-						// 
-						// 
-						// .get(0) Le da al sonido
-						// .get(1) se sale
 						
 						driver.findElements(By.xpath("//*[name()='div' and @class='x6s0dn4 x78zum5 xdt5ytf xl56j7k']")).get(0).click();
 						System.out.println("Le hemos dado a pause correctamente");
-						Thread.sleep(20000);
-						loading = false;
 						
-						int networkl = ((Long) js.executeScript("return(let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {};  let network = performance.getEntries() || {}; return(network.length);")).intValue();
+						int networkl = ((Long) js.executeScript("let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {};  let network = performance.getEntries() || {}; return(network.length);")).intValue();
 						System.out.println("Ejecutando el script...");
-						for(int i=0; i<networkl ;i++) {
-							String nscript = "let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; let network = performance.getEntries() || {}; if (network["+i+"].initiatorType == 'fetch'){ return(network["+i+"].name)} ";
-							storysrc.add((String) js.executeScript(nscript));
-						}
 						
+						for(int i=0; i<networkl ;i++) {
+							String nscript = "let performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; let network = performance.getEntries() || {}; if ( (network["+i+"].initiatorType == 'fetch') || (network["+i+"].initiatorType == 'img') ){ return(network["+i+"].name)} ";
+							
+							String storysc = (String) js.executeScript(nscript);
+							if (!(storysc == null)) {
+								if (storysc.contains("&bytestart=")) {
+									int bytestart = storysc.indexOf("&bytestart=");
+									storysc = storysc.substring(0, bytestart);
+								}
+								if (!(arrstorysrc.contains(storysc))) {
+									arrstorysrc.add(storysc);
+								}		
+							}
+						}	
+						loading = false;
 					} else {
-						// La historia es un video
-						if (res == 1) {
-							System.out.println("Esta historia  es un video");
-							if (isButton) {
-								driver.findElement(By.cssSelector("button[class='_ac0d']")).click();
-								System.out.println("Existia un boton derecho y le he dado click");
-							} else {
-								// FUNCIONA
-								driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
-								System.out.println("No existia boton, era svg y le he dado click");
-							}
-						}// La historia es una foto 
-						else {
-							System.out.println("Esta historia es una foto");
-							if (isButton) {
-								driver.findElement(By.cssSelector("button[class='_ac0d']")).click();
-								System.out.println("Existia un boton derecho y le he dado click");
-							} else {
-								// FUNCIONA
-								driver.findElements(By.cssSelector("svg[class='x1lliihq x1n2onr6 xq3z1fi']")).get(3).click();
-								System.out.println("No existia boton, era svg y le he dado click");
-							}
+						List<WebElement> svgElements = null;
+						if (isButton) {
+							svgElements = driver.findElements(By.tagName("button"));
+						} 
+						else if (!isButton) {
+							svgElements = driver.findElements(By.tagName("svg"));
 						}
+						// Recorro los elementos hasta encontrar la flecha ya sea un boton 
+						for (WebElement svgElement : svgElements) {
+							// Esta variable es muy importante porque variara segun el idioma
+							String next = "Siguiente";
+							if (svgElement.getAttribute("ariaLabel").equals(next)) {
+								svgElement.click();
+							}
+						}	
 					}
-				}catch (Exception e) { System.out.println("\n\nError no encuentro la flecha"); }
+				}catch (Exception e) { System.out.println("\n\nError no encuentro la flecha"); e.printStackTrace(); }
 			} else {
-				loading = false;
-			}
-			
+				loading = false;	
+			}			
 		}
 		System.out.println("Hay un total de "+l+" instagram stories js");
-		
+				
 		System.out.println("Leyendo las direcciones =");
-		for (int i=0; i<storysrc.size(); i++) {
-			System.out.println("imagen "+i+" "+storysrc.get(i));
+		for (int i=0; i<arrstorysrc.size(); i++) {
+			System.out.println("imagen "+i+" "+arrstorysrc.get(i));
 		}
+		
 	}
 }
